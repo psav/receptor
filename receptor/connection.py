@@ -25,22 +25,22 @@ class Connection:
         while True:
             for data in buf.get():
                 if "cmd" in data and data["cmd"] == "ROUTE":
-                    self.handle_route_advertisement(data)
+                    await self.handle_route_advertisement(data)
                     await self.receptor.router.build_forwarding_table()
                 else:
                     await self.handle_message(data)
             await asyncio.sleep(.1)
 
-    def handle_route_advertisement(self, data):
+    async def handle_route_advertisement(self, data):
         for edge in data["edges"]:
             existing_edge = self.receptor.router.find_edge(edge[0], edge[1])
             if existing_edge and existing_edge[2] > edge[2]:
                 self.receptor.router.update_node(edge[0], edge[1], edge[2])
             else:
                 self.receptor.router.register_edge(*edge)
-        self.send_route_advertisement(data["edges"], data["seen"])
+        await self.send_route_advertisement(data["edges"], data["seen"])
 
-    def send_route_advertisement(self, edges=None, seen=[]):
+    async def send_route_advertisement(self, edges=None, seen=[]):
         edges = edges or self.receptor.router.get_edges()
         seen = set(seen)
         logger.debug("Emitting Route Advertisements, excluding {}".format(seen))

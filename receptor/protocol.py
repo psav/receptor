@@ -90,7 +90,7 @@ class BaseProtocol(asyncio.Protocol):
             for data in self.incoming_buffer.get():
                 logger.debug(data)
                 if data["cmd"] == "HI":
-                    self.handle_handshake(data)
+                    await self.handle_handshake(data)
                     break
                 else:
                     logger.error("Handshake failed!")
@@ -119,11 +119,11 @@ class BasicProtocol(BaseProtocol):
         super().connection_made(transport)
         logger.info('Connection from {}'.format(self.peername))
 
-    def handle_handshake(self, data):
+    async def handle_handshake(self, data):
         super().handle_handshake(data)
         logger.debug("Received handshake from client with id %s, responding...", data["id"])
         self.send_handshake()
-        self.connection.send_route_advertisement()
+        await self.connection.send_route_advertisement()
 
 
 async def create_peer(receptor, loop, host, port):
@@ -150,10 +150,10 @@ class BasicClientProtocol(BaseProtocol):
         info = self.transport.get_extra_info('peername')
         self.loop.create_task(create_peer(self.receptor, self.loop, info[0], info[1]))
 
-    def handle_handshake(self, data):
+    async def handle_handshake(self, data):
         super().handle_handshake(data)
         logger.debug("Received handshake from server with id %s", data["id"])
-        self.connection.send_route_advertisement()
+        await self.connection.send_route_advertisement()
 
 
 class BasicControllerProtocol(asyncio.Protocol):
