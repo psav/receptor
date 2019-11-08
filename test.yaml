@@ -1,0 +1,18 @@
+nodes:
+  controller:
+    name: controller
+    controller: True
+    listen_port: 8888
+    connections: []
+  node1:
+    name: node1
+    controller: False
+    connections: [controller]
+  node2:
+    name: node2
+    controller: False
+    connections: [node1]
+  node3:
+    name: node3
+    controller: False
+    connections: [controller, node1]
