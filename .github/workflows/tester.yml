@@ -19,8 +19,24 @@ jobs:
         pip install python-dateutil
         pip install .
         pip install -r scripts/requirements.txt
-    - name: Perform perf test
+    - name: Perform perf test 1 - Random
       run: |
-        python ./scripts/node_utils.py file scripts/topology.yaml&
+        python ./scripts/node_utils.py file scripts/topology-random.yaml&
         sleep 10
-        python scripts/node_utils.py ping scripts/topology.yaml --count 100 --validate 0.1
+        python scripts/node_utils.py ping scripts/topology-random.yaml --count 100 --validate 0.1
+        kill `pidof python`
+        rm -Rf /tmp/receptor
+    - name: Perform perf test 2 - Flat
+      run: |
+        python ./scripts/node_utils.py file scripts/topology-flat.yaml&
+        sleep 10
+        python scripts/node_utils.py ping scripts/topology-flat.yaml --count 100 --validate 0.1
+        kill `pidof python`
+        rm -Rf /tmp/receptor
+    - name: Perform perf test 3 - Tree
+      run: |
+        python ./scripts/node_utils.py file scripts/topology-tree.yaml&
+        sleep 10
+        python scripts/node_utils.py ping scripts/topology-tree.yaml --count 100 --validate 0.1
+        kill `pidof python`
+        rm -Rf /tmp/receptor
