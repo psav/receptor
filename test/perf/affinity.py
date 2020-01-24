@@ -38,6 +38,10 @@ atexit.register(shut_all_procs)
 
 @attr.s
 class Node:
+    """
+    A Node represents a receptor Node instance. It is expected to be managed by the affinity
+    framework and hence is not suitable for Nodes that the framework does not have control over.
+    """
     name = attr.ib()
     controller = attr.ib(default=False)
     listen = attr.ib(default=None)
@@ -200,6 +204,18 @@ class Node:
 
 @attr.s
 class DiagNode(Node):
+    """
+    Diagnostics Node is a special type of node that is not strictly part of the mesh from a
+    functional perspective. The diagnostics node has an API that is accessed via the methods
+    that form a part of this class.
+
+    Currently the following API calls are supported
+
+    "/start", which starts the node
+    "/add_peer", which adds a peer and takes a listener address
+    "/ping", which pings a node
+    "/connections" which lists the connections the node has
+    """
     api_address = attr.ib(default="0.0.0.0")
     api_port = attr.ib(default=8080)
     node_type = DIAG
@@ -264,6 +280,9 @@ class DiagNode(Node):
 
 @attr.s
 class Mesh:
+    """
+    Defines a mesh and exposes mesh based functionality
+    """
     use_diag_node = attr.ib(default=False)
     nodes = attr.ib(init=False, factory=dict)
     diag_node = attr.ib(init=False, default=None)
